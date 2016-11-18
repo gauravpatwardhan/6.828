@@ -39,13 +39,14 @@ def test(points, title=None, parent=None):
             run_test.complete = True
             if parent:
                 parent()
-
+            print("here1")
             # Run the test
             fail = None
             start = time.time()
             CURRENT_TEST = run_test
             sys.stdout.write("%s: " % title)
             sys.stdout.flush()
+            print("here2")
             try:
                 fn()
             except AssertionError as e:
@@ -418,7 +419,7 @@ class Runner():
                 if self.gdb is None:
                     sys.exit(1)
                 self.gdb.kill()
-                self.__react(self.reactors, 5)
+                self.__react(self.reactors, 10)
                 self.gdb.close()
                 self.qemu.wait()
             except:
