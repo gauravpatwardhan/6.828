@@ -41,6 +41,7 @@ i386_init(void)
 	test_backtrace(5);
 
 	// Lab 2 memory initialization functions
+	cprintf("Entering mem_init function\n");
 	mem_init();
 
 	// Drop into the kernel monitor.
