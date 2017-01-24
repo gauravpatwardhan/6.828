@@ -1,0 +1,9 @@
+<See the pdf with the diagram for the following explanation>
+
+1. High addresses (above KERNBASE) in VA are kernel addresses, mapped to the entire PA space. This is so that kernel gets RW access to the whole memory while user does not.
+2. Lower addresses (0-UTOP) are user space when fully booted up, but in this case, it contains the dummy page directory 'entrypgdir' setup so that Kernel can access switch from a 'logical address <-> linear address' mapping to 'virtual address <-> linear address' mapping. This us 4 MB is size and is mapped to [0-4 MB] in PM.
+3. For user's and kernel's read only purposes, the virtual page table and read-only copies of page structures are mapped at UVPT and UPAGES respectively.
+
+Q. what about the layouts of entrypgdir and kern_pgdir make it safe for the kernel to switch from the former to the latter and continue executing ?
+The kern_pgdir and entrypgdir are virtual pages to the same memory location. Hence when kernel switches from former to the latter, the only thing which changes is the way kernel references its own addresses from a lower address space to a higher one.
+
