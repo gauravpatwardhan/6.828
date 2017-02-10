@@ -1,0 +1,20 @@
+Explaination - Interrups were enabled while the locks were held. 
+
+
+80104c26	-	enter scheduler
+				sched()
+					if(cpu->ncli != 1)
+						panic("sched locks");
+80104cc5	-	release(&ptable,lock) in yield()
+80106a5b	-	// Force process to give up CPU on clock tick.
+				// If interrupts were on while locks held, would need to check nlock.
+				if(proc && proc->state == RUNNING && tf->trapno == T_IRQ0+IRQ_TIMER)
+					yield()
+
+80106651 - just before trapret, end of alltraps
+801029cd - idestart(b)
+801001e7 - iderw(b)
+80101398 - b = bread(dev,1)
+8010166c - readsb(dev, &sb)
+80104d0b - iinit(ROOTDEV)
+80106654 - (asm) trapret
