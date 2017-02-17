@@ -1,0 +1,14 @@
+Q1. 
+sched() - sched runs on process's kernel stack
+scheduler() - runs on its own stack
+when sched() calls swtch(), the call for swtch() does not return. its just switches from one kernel process to the scheduler stack.
+
+Q2.
+No, we cannot do less work with swtch and still be correct. Swtch() basically emulates the GCC calling convention for switching the current context from kernel to scheduler thread and vice versa. It does this just by restoring the ebx, edx, etc. registers. 
+
+
+What is the four character pattern ?
+recurring "badc" - this corresponds to 4 states. proc 1 to scheduler, scheduler to proc 2, proc 2 to scheduler, scheduler to proc 1.
+
+Why are the first characters "ac"?
+That is first time the timer IRQ is fired and the init process is trapped to the kernel and the scheduler thread runs the first time.
