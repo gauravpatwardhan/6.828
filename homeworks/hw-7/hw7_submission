@@ -1,0 +1,8 @@
+1. Since wakeup runs after accquiring ptable.lock, in sleep, we release the lk.lock and reaccquire it after returning back. Wakeup keeps spinning on the accquire lock function thus avoiding a deadlock.
+
+If ptable.lock is not used, then the following situation might happen:
+
+sleep makes the proc -> chan = chan, then before setting the proc->state = SLEEPING, a IRQ_TMR for yield is triggered for the other process to wakup. wakeup checks if the process are sleeping and if yes, sets their chan to the appropriate value. But since our process which wanted to go to sleep has been interrupted before it could change its state to SLEEPING, it missed out on the wakeup signal.
+
+
+2. In iderw, we use sleep with an idelock. This is because if a process issues a disk read request and then an interrupt is called before the process goes to sleep then the process might miss the data read from the disk into the buffer. When we use the idelock, this does not happen since the interrupts are disabled when the process accquires the idelock.
