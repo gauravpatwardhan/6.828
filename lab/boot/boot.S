@@ -25,8 +25,6 @@ start:
   #   For backwards compatibility with the earliest PCs, physical
   #   address line 20 is tied low, so that addresses higher than
   #   1MB wrap around to zero by default.  This code undoes this.
-  #   The hack enables 21st address bit by using I/O to the keyboard 
-  #   controller on ports 0x64 and 0x60
 seta20.1:
   inb     $0x64,%al               # Wait for not busy
   testb   $0x2,%al
