@@ -419,7 +419,7 @@ class Runner():
                 if self.gdb is None:
                     sys.exit(1)
                 self.gdb.kill()
-                self.__react(self.reactors, 10)
+                self.__react(self.reactors, 5)
                 self.gdb.close()
                 self.qemu.wait()
             except:
