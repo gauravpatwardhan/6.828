@@ -121,6 +121,7 @@ void
 mem_init(void)
 {
 	uint32_t cr0;
+	uint32_t size;
 	size_t n;
 
 	// Find out how much memory the machine has (npages & npages_basemem).
@@ -157,6 +158,10 @@ mem_init(void)
 	// Make 'envs' point to an array of size 'NENV' of 'struct Env'.
 	// LAB 3: Your code here.
 
+	envs = (struct Env *)boot_alloc(sizeof(struct Env)*NENV);
+	memset(envs, 0, NENV*sizeof(struct Env));
+
+
 
 	//////////////////////////////////////////////////////////////////////
 	// Now that we've allocated the initial kernel data structures, we set
@@ -180,8 +185,8 @@ mem_init(void)
 	//      (ie. perm = PTE_U | PTE_P)
 	//    - pages itself -- kernel RW, user NONE
 	// Your code goes here:
-
-	boot_map_region(kern_pgdir, UPAGES, PTSIZE, PADDR(pages), PTE_U | PTE_P);
+	uint32_t size1 = ROUNDUP(npages * sizeof(struct PageInfo), PGSIZE);
+	boot_map_region(kern_pgdir, UPAGES, size1, PADDR(pages), PTE_U | PTE_P);
 
 	//////////////////////////////////////////////////////////////////////
 	// Map the 'envs' array read-only by the user at linear address UENVS
@@ -190,6 +195,9 @@ mem_init(void)
 	//    - the new image at UENVS  -- kernel R, user R
 	//    - envs itself -- kernel RW, user NONE
 	// LAB 3: Your code here.
+
+ 	size = ROUNDUP(NENV * sizeof(struct Env), PGSIZE);
+ 	boot_map_region(kern_pgdir, UENVS, size, PADDR(envs), PTE_U | PTE_P);
 
 	//////////////////////////////////////////////////////////////////////
 	// Use the physical memory that 'bootstack' refers to as the kernel
@@ -325,6 +333,7 @@ page_free(struct PageInfo *pp)
 {
 	// Fill this function in
 	assert(pp->pp_ref == 0);
+	assert(pp->pp_link == NULL);
 	pp->pp_link = page_free_list;
 	page_free_list = pp;
 	return;
@@ -556,6 +565,22 @@ int
 user_mem_check(struct Env *env, const void *va, size_t len, int perm)
 {
 	// LAB 3: Your code here.
+	uint32_t start = (uint32_t) va;
+	uint32_t current = ROUNDDOWN(start, PGSIZE);
+	uint32_t end = start + len;
+	pte_t *test_page;
+
+	while (current < end) {
+		test_page = pgdir_walk(env->env_pgdir, (void *) current, false);
+		if (!test_page || current > ULIM || (((uint32_t) *test_page & perm) != perm)) {
+			if (current == ROUNDDOWN(start, PGSIZE))
+				user_mem_check_addr = (uintptr_t) va;
+			else
+				user_mem_check_addr = (uintptr_t) current;
+			return -E_FAULT;
+		}
+		current += PGSIZE;
+	}
 
 	return 0;
 }
@@ -570,7 +595,7 @@ user_mem_check(struct Env *env, const void *va, size_t len, int perm)
 void
 user_mem_assert(struct Env *env, const void *va, size_t len, int perm)
 {
-	if (user_mem_check(env, va, len, perm | PTE_U) < 0) {
+	if (user_mem_check(env, va, len, perm | PTE_U | PTE_P) < 0) {
 		cprintf("[%08x] user_mem_check assertion failure for "
 			"va %08x\n", env->env_id, user_mem_check_addr);
 		env_destroy(env);	// may not return

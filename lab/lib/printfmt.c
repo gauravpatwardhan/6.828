@@ -212,7 +212,7 @@ vprintfmt(void (*putch)(int, void*), void *putdat, const char *fmt, va_list ap)
 			goto number;
 			//putch('X', putdat);
 			//putch('X', putdat);
-			break;
+			//break;
 
 		// pointer
 		case 'p':

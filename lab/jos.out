@@ -1,14 +1,21 @@
-***
-*** Now run 'make gdb'.
-***
++ ld obj/kern/kernel
++ mk obj/kern/kernel.img
 
-(process:2379): GLib-WARNING **: /build/glib2.0-MuyBSS/glib2.0-2.46.2/./glib/gmem.c:482: custom memory allocation vtable not supported
+(process:31385): GLib-WARNING **: /build/glib2.0-MuyBSS/glib2.0-2.46.2/./glib/gmem.c:482: custom memory allocation vtable not supported
+
+(process:31387): GLib-WARNING **: /build/glib2.0-MuyBSS/glib2.0-2.46.2/./glib/gmem.c:482: custom memory allocation vtable not supported
 6828 decimal is 15254 octal!
 Physical memory: 66556K available, base = 640K, extended = 65532K
 check_page_alloc() succeeded!
 check_page() succeeded!
 check_kern_pgdir() succeeded!
 check_page_installed_pgdir() succeeded!
+[00000000] new env 00001000
+Incoming TRAP frame at 0xefffffbc
+Incoming TRAP frame at 0xefffffbc
+[00001000] user_mem_check assertion failure for va f010000c
+[00001000] free env 00001000
+Destroyed the only environment - nothing more to do!
 Welcome to the JOS kernel monitor!
 Type 'help' for a list of commands.
-K> 
+qemu: terminating on signal 15 from pid 31301
